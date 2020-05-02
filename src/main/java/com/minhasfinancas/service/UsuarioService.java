@@ -1,5 +1,7 @@
 package com.minhasfinancas.service;
 
+import java.util.List;
+
 import com.minhasfinancas.model.entity.Usuario;
 
 public interface UsuarioService {
@@ -9,4 +11,6 @@ public interface UsuarioService {
 	Usuario salvar(Usuario usuario);
 	
 	void validarEmail(String email);
+	
+	List<Usuario> listar();
 }

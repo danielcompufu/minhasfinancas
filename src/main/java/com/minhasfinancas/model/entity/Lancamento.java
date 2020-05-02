@@ -11,19 +11,22 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotBlank;
 
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import com.minhasfinancas.model.enums.StatusLancamento;
 import com.minhasfinancas.model.enums.TipoLancamento;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Lancamento {
 
 	@Id
@@ -32,28 +35,17 @@ public class Lancamento {
 	
 	@ManyToOne
 	private Usuario usuario;
-	
-	@NotBlank
 	private String descricao;
-	
-	@NotBlank
 	private Integer mes;
-	
-	@NotBlank
 	private Integer ano;
-	
-	@NotBlank
 	private BigDecimal valor;
-	
-	@NotBlank
+
 	@Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
 	private LocalDate dataCadastro;
 	
-	@NotBlank
 	@Enumerated(value = EnumType.STRING)
 	private TipoLancamento tipo;
 	
-	@NotBlank
 	@Enumerated(value = EnumType.STRING)
 	private StatusLancamento status;
 	
