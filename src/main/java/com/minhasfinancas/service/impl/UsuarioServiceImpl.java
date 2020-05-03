@@ -52,8 +52,12 @@ public class UsuarioServiceImpl implements UsuarioService{
 
 	@Override
 	public List<Usuario> listar() {
-		// TODO Auto-generated method stub
 		return usuarioRepository.findAll();
+	}
+
+	@Override
+	public Optional<Usuario> obterPorId(Long id) {
+		return usuarioRepository.findById(id);
 	}
 
 	

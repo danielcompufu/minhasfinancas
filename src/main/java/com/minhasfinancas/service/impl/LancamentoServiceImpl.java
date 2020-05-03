@@ -1,8 +1,10 @@
 package com.minhasfinancas.service.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.minhasfinancas.exception.RegraNegocioException;
 import com.minhasfinancas.model.entity.Lancamento;
 import com.minhasfinancas.model.enums.StatusLancamento;
+import com.minhasfinancas.model.enums.TipoLancamento;
 import com.minhasfinancas.repository.LancamentoRepository;
 
 @Service
@@ -27,6 +30,7 @@ public class LancamentoServiceImpl implements com.minhasfinancas.service.Lancame
 	@Transactional
 	public Lancamento salvar(Lancamento lancamento) {
 		validar(lancamento);
+		lancamento.setDataCadastro(LocalDate.now());
 		lancamento.setStatus(StatusLancamento.PENDENTE);
 		return repository.save(lancamento);
 	}
@@ -57,9 +61,9 @@ public class LancamentoServiceImpl implements com.minhasfinancas.service.Lancame
 	}
 
 	@Override
-	public void atualizarStatus(Lancamento lancamento, StatusLancamento status) {
+	public Lancamento atualizarStatus(Lancamento lancamento, StatusLancamento status) {
 		lancamento.setStatus(status);
-		repository.save(lancamento);
+		return repository.save(lancamento);
 	}
 
 	@Override
@@ -87,5 +91,26 @@ public class LancamentoServiceImpl implements com.minhasfinancas.service.Lancame
 		if(lancamento.getTipo() == null) {
 			throw new RegraNegocioException("Informe um Tipo valido");
 		}
+	}
+
+	@Override
+	public Optional<Lancamento> obterPorId(Long id) {
+		return repository.findById(id);
+	}
+
+	@Override
+	public BigDecimal obterSaldoPorUsuario(Long idUsuario) {
+		BigDecimal saldoReceita = repository.obterSaldoPorTipoLancamentoUsuario(idUsuario, TipoLancamento.RECEITA);
+		BigDecimal saldoDespesa = repository.obterSaldoPorTipoLancamentoUsuario(idUsuario, TipoLancamento.DESPESA);
+		
+		if (saldoDespesa == null) {
+			saldoDespesa = BigDecimal.ZERO;
+		}
+		
+		if (saldoReceita == null) {
+			saldoReceita = BigDecimal.ZERO;
+		}
+				
+		return saldoReceita.subtract(saldoDespesa);
 	}
 }
