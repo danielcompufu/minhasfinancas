@@ -21,11 +21,11 @@ import com.minhasfinancas.model.enums.TipoLancamento;
 import com.minhasfinancas.repository.LancamentoRepository;
 
 @Service
-public class LancamentoServiceImpl implements com.minhasfinancas.service.LancamentoService{
+public class LancamentoServiceImpl implements com.minhasfinancas.service.LancamentoService {
 
 	@Autowired
 	private LancamentoRepository repository;
-	
+
 	@Override
 	@Transactional
 	public Lancamento salvar(Lancamento lancamento) {
@@ -48,15 +48,13 @@ public class LancamentoServiceImpl implements com.minhasfinancas.service.Lancame
 	public void deletar(Lancamento lancamento) {
 		Objects.requireNonNull(lancamento.getId());
 		repository.delete(lancamento);
-		
+
 	}
 
 	@Override
 	public List<Lancamento> buscar(Lancamento lancamento) {
 		Example<Lancamento> example = Example.of(lancamento,
-				ExampleMatcher.matching()
-				.withIgnoreCase()
-				.withStringMatcher(StringMatcher.CONTAINING));
+				ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 		return repository.findAll(example);
 	}
 
@@ -68,27 +66,27 @@ public class LancamentoServiceImpl implements com.minhasfinancas.service.Lancame
 
 	@Override
 	public void validar(Lancamento lancamento) {
-		if(lancamento.getDescricao() == null || "".equals(lancamento.getDescricao().trim())) {
+		if (lancamento.getDescricao() == null || "".equals(lancamento.getDescricao().trim())) {
 			throw new RegraNegocioException("Informe uma Descricao valida");
 		}
-		
-		if(lancamento.getMes() == null || lancamento.getMes() > 12) {
+
+		if (lancamento.getMes() == null || lancamento.getMes() > 12) {
 			throw new RegraNegocioException("Informe um Mes valido");
 		}
-		
-		if(lancamento.getAno() == null || lancamento.getAno().toString().length() != 4) {
+
+		if (lancamento.getAno() == null || lancamento.getAno().toString().length() != 4) {
 			throw new RegraNegocioException("Informe um Ano valido");
 		}
-		
-		if(lancamento.getUsuario() == null || lancamento.getUsuario().getId() == null) {
+
+		if (lancamento.getUsuario() == null || lancamento.getUsuario().getId() == null) {
 			throw new RegraNegocioException("Informe um Usuario valido");
 		}
-		
-		if(lancamento.getValor() == null || lancamento.getValor().compareTo(BigDecimal.ZERO) < 1) {
+
+		if (lancamento.getValor() == null || lancamento.getValor().compareTo(BigDecimal.ZERO) < 1) {
 			throw new RegraNegocioException("Informe um Valor valido");
 		}
-		
-		if(lancamento.getTipo() == null) {
+
+		if (lancamento.getTipo() == null) {
 			throw new RegraNegocioException("Informe um Tipo valido");
 		}
 	}
@@ -100,17 +98,19 @@ public class LancamentoServiceImpl implements com.minhasfinancas.service.Lancame
 
 	@Override
 	public BigDecimal obterSaldoPorUsuario(Long idUsuario) {
-		BigDecimal saldoReceita = repository.obterSaldoPorTipoLancamentoUsuario(idUsuario, TipoLancamento.RECEITA);
-		BigDecimal saldoDespesa = repository.obterSaldoPorTipoLancamentoUsuario(idUsuario, TipoLancamento.DESPESA);
-		
+		BigDecimal saldoReceita = repository.obterSaldoPorTipoLancamentoUsuarioStatus(idUsuario, TipoLancamento.RECEITA,
+				StatusLancamento.EFETIVADO);
+		BigDecimal saldoDespesa = repository.obterSaldoPorTipoLancamentoUsuarioStatus(idUsuario, TipoLancamento.DESPESA,
+				StatusLancamento.EFETIVADO);
+
 		if (saldoDespesa == null) {
 			saldoDespesa = BigDecimal.ZERO;
 		}
-		
+
 		if (saldoReceita == null) {
 			saldoReceita = BigDecimal.ZERO;
 		}
-				
+
 		return saldoReceita.subtract(saldoDespesa);
 	}
 }

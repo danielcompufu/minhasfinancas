@@ -5,5 +5,4 @@ public enum StatusLancamento {
 	PENDENTE,
 	CANCELADO,
 	EFETIVADO
-
 }

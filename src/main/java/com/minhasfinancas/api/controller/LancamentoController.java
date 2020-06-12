@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.minhasfinancas.dto.StatusLancamentoDTO;
 import com.minhasfinancas.exception.RegraNegocioException;
 import com.minhasfinancas.model.entity.Lancamento;
 import com.minhasfinancas.model.entity.Usuario;
+import com.minhasfinancas.model.enums.StatusLancamento;
 import com.minhasfinancas.service.LancamentoService;
 import com.minhasfinancas.service.UsuarioService;
 
@@ -59,12 +61,11 @@ public class LancamentoController {
 	
 	
 	@PatchMapping(value = "{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public Lancamento atualizarStatus(@PathVariable(value = "id") Long id, @Valid @RequestBody Lancamento lancamento) {
+	public Lancamento atualizarStatus(@PathVariable(value = "id") Long id, @RequestBody StatusLancamentoDTO status) {
 		Lancamento lancamentoEntity = lancamentoService.obterPorId(id)
 				.orElseThrow(() -> new RegraNegocioException("Lancamento nao encontrado para o Id informado!"));
 		
-		lancamentoEntity.setStatus(lancamento.getStatus());
-	    return lancamentoService.atualizarStatus(lancamentoEntity, lancamento.getStatus());
+	    return lancamentoService.atualizarStatus(lancamentoEntity, StatusLancamento.valueOf(status.getStatus()));
 	}
 	
 	@DeleteMapping(value = "{id}")
@@ -93,6 +94,12 @@ public class LancamentoController {
 		lancamentoFiltro.setUsuario(usuario);
 		
 		return lancamentoService.buscar(lancamentoFiltro); 
+	}
+	
+	@GetMapping("{id}")
+	public Lancamento buscarPorId(@PathVariable("id") long id) {
+		return lancamentoService.obterPorId(id)
+			.orElseThrow(() -> new RegraNegocioException("Lancamento nao encontrado para o Id informado!"));
 	}
 	
 }
